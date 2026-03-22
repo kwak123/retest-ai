@@ -1,4 +1,4 @@
-import { LanguageParser, TestBlock } from "./interface";
+import { LanguageParser, TestBlock } from "./interface.js";
 import { parse } from "@typescript-eslint/typescript-estree";
 import { AST_NODE_TYPES, TSESTree } from "@typescript-eslint/typescript-estree";
 

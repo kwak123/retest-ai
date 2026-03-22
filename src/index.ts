@@ -2,10 +2,15 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import express from "express";
 import { z } from "zod";
-import { TestStore } from "./store";
-import { recordTestGeneration } from "./tools/record_test";
+import { TestStore } from "./store.js";
+import { recordTestGeneration } from "./tools/record_test.js";
+import { summarizeTestHealth } from "./tools/query_test.js";
 import path from "path";
-import { JsonPromptManager } from "./prompt/json_manager";
+import { fileURLToPath } from "url";
+import { JsonPromptManager } from "./prompt/json_manager.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Initialize Store
 const projectRoot = process.cwd();
@@ -37,7 +42,7 @@ async function main() {
           parentId: z.string().optional(),
           tags: z.record(z.string()).optional()
       },
-      async (args) => {
+      async (args: { filePath: string; prompt: string; content: string; parentId?: string; tags?: Record<string, string> }) => {
           return {
               content: [{ 
                   type: "text", 
@@ -78,12 +83,25 @@ async function main() {
   server.tool(
       "get_test_info",
       { filePath: z.string() },
-      async (args) => {
+      async (args: { filePath: string }) => {
           const tests = await store.getTests(args.filePath);
           return {
               content: [{
                   type: "text",
                   text: JSON.stringify(tests, null, 2)
+              }]
+          };
+      }
+  );
+
+  server.tool(
+      "summarize_test_health",
+      {},
+      async () => {
+          return {
+              content: [{
+                  type: "text",
+                  text: JSON.stringify(await summarizeTestHealth(store), null, 2)
               }]
           };
       }

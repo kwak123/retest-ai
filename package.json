@@ -2,6 +2,7 @@
   "name": "retest-ai-mcp-server",
   "version": "1.0.0",
   "description": "An MCP server for tracking and executing unit tests with AI agents.",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",

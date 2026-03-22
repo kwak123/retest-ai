@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
-import { IPromptManager, PromptVersion } from './interface';
+import { IPromptManager, PromptVersion } from './interface.js';
 
 export class JsonPromptManager implements IPromptManager {
   private dbPath: string;

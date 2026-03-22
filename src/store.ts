@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
-import { IPromptManager } from './prompt/interface';
+import { IPromptManager } from './prompt/interface.js';
 
 export interface TestDefinition {
   name: string;
