@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>retest-ai Dashboard</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .file-entry { margin-bottom: 20px; border: 1px solid #ccc; padding: 10px; border-radius: 5px; }
+        .test-entry { margin-left: 20px; padding: 5px; border-left: 2px solid #eee; }
+        .prompt-hash { font-family: monospace; color: #666; font-size: 0.9em; }
+        h3 { margin-top: 0; }
+    </style>
+</head>
+<body>
+    <h1>retest-ai Dashboard</h1>
+    <div id="test-list">
+        <p>Loading tests...</p>
+    </div>
+
+    <script>
+        async function loadTests() {
+            try {
+                const response = await fetch('/api/tests');
+                const data = await response.json();
+                renderTests(data);
+            } catch (e) {
+                document.getElementById('test-list').innerText = 'Error loading tests: ' + e;
+            }
+        }
+
+        function renderTests(testFiles) {
+            const container = document.getElementById('test-list');
+            container.innerHTML = '';
+
+            if (Object.keys(testFiles).length === 0) {
+                container.innerHTML = '<p>No tests recorded yet.</p>';
+                return;
+            }
+
+            for (const [filePath, fileData] of Object.entries(testFiles)) {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'file-entry';
+                
+                const header = document.createElement('h3');
+                header.innerText = filePath;
+                fileDiv.appendChild(header);
+
+                const meta = document.createElement('div');
+                meta.innerText = `Modified: ${new Date(fileData.last_modified).toLocaleString()} | Lang: ${fileData.language}`;
+                fileDiv.appendChild(meta);
+
+                const testsContainer = document.createElement('div');
+                for (const [testName, testData] of Object.entries(fileData.tests)) {
+                    const testDiv = document.createElement('div');
+                    testDiv.className = 'test-entry';
+                    testDiv.innerHTML = `
+                        <strong>${testName}</strong> <br>
+                        <span class="prompt-hash">Prompt: ${testData.prompt_hash?.substring(0, 8)}...</span>
+                        <span class="prompt-hash">Code: ${testData.code_hash?.substring(0, 8)}...</span>
+                        <button onclick="alert('TODO: Re-run')">Run</button>
+                    `;
+                    testsContainer.appendChild(testDiv);
+                }
+                fileDiv.appendChild(testsContainer);
+                container.appendChild(fileDiv);
+            }
+        }
+
+        loadTests();
+    </script>
+</body>
+</html>
